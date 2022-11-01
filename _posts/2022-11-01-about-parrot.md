@@ -1,4 +1,15 @@
+---
+title: ABOUT PARROT
+author: cotes
+date: 2022-11-01 11:33:00 +0800
+categories: [Blogging]
+tags: [typography]
+math: true
+mermaid: true
+---
+
 # 鹦鹉简介
+
 
 鹦鹉是鹦形目（学名：Psittaciformes）众多羽毛艳丽、爱叫的[鸟](https://baike.baidu.com/item/鸟?fromModule=lemma_inlink)。典型的[攀禽](https://baike.baidu.com/item/攀禽/2021723?fromModule=lemma_inlink)，对趾型足，两趾向前两趾向后，适合抓握，鸟喙强劲有力，可以食用硬壳果。羽色鲜艳，常被作为宠物饲养。它们以其美丽的羽毛，善学人语技能的特点，更为人们所欣赏和钟爱。鹦鹉中体形最大的当属[紫蓝金刚鹦鹉](https://baike.baidu.com/item/紫蓝金刚鹦鹉/1227730?fromModule=lemma_inlink)，体长可达 100 厘米，最小的是[蓝冠短尾鹦鹉](https://baike.baidu.com/item/蓝冠短尾鹦鹉/6279661?fromModule=lemma_inlink) ，体长仅有 12 厘米。大多数鹦鹉主食树上或者地面上的植物果实、种子、坚果、浆果、嫩芽嫩枝等，兼食少量昆虫。吸蜜鹦鹉类则主食花粉、花蜜及柔软多汁的果实。鹦鹉类在世界各地都有分布。分布在温、亚热、热带的广大地域。种类非常繁多，有 2 科、82 属、358 种，是[鸟纲](https://baike.baidu.com/item/鸟纲/1194548?fromModule=lemma_inlink)最大的科之一。
 
@@ -10,15 +21,15 @@
 
 玄凤鹦鹉 —又名鸡尾鹦鹉，头上有羽冠，长约 7 厘米左右，属于中小型鹦鹉，常见的颜色主要有三类：珍珠灰，原始灰和黄化。综合性格和颜值我认为选黄化会好一些，性格比较温和。成年后的公鹦鹉翅膀内侧斑点会消失，变成无斑点，母鹦鹉翅膀内侧一直有斑点。
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
+![img](../_data/assets/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
 
 ​                                                                                                                     黄化
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
+![img](../_data/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
 
 ​                                                                                                                原始灰
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
+![img](../_data/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
 
 ​                                                                                                             珍珠灰
 
@@ -66,15 +77,15 @@
 
 常见的头类有费氏牡丹鹦鹉，常见的面类是黄桃和绿桃，费氏牡丹鹦鹉的特征是眼睛有白圈，嘴巴为红色。面类的特征是眼睛没有白圈，嘴巴一般为黄色。两者杂交则是骡子，骡子嘴巴带红色，一般情况下不能繁育，面类的经过人工繁育，性格较为温和。
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-961f3afa7143113ae8a52da734bdcbc0_1440w.png)
+![img](../_data/assets/img/v2-961f3afa7143113ae8a52da734bdcbc0_1440w.png)
 
 ​																												黄桃
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-27d48567406840964c7a25b0da45ca8b_1440w.png)
+![img](../_data/assets/img/v2-27d48567406840964c7a25b0da45ca8b_1440w.png)
 
 ​																												绿桃
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-37ab7dd6d4ba86d3eaf71929112496f5_1440w.png)
+![img](../_data/assets/img/v2-37ab7dd6d4ba86d3eaf71929112496f5_1440w.png)
 
 ​																												费氏牡丹
 
@@ -115,11 +126,11 @@
 
 虎皮鹦鹉 —— 又名娇凤或者鹦哥 ，属于小型鹦鹉，性情活泼胆大且易于饲养，在中国是大众最喜欢最常见的宠物鸟之一。公鸟成年后鼻膜为蓝色，母鸟为棕色。成年以后头上的虎斑褪去，我们可以从日常观察中能发现公鸟好动一些，更喜欢在房间里到处走，比母鸟更容易亲人，咬人力度更轻。母鸟领地意识更强。
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-938f2b23edd61d2f06f0340708901b51_1440w.png)
+![img](../_data/assets/img/v2-938f2b23edd61d2f06f0340708901b51_1440w.png)
 
 ​                																				绿色为最常见的原始种
 
-![img](/Users/didi/doc/davisjiahao.github.io/assets/img/v2-d64d6fbb37290f3276d0d3ac509bda4d_1440w.png)
+![img](../_data/assets/img/v2-d64d6fbb37290f3276d0d3ac509bda4d_1440w.png)
 
 ​																						         左边为人工培养种
 
