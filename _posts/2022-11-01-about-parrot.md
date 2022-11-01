@@ -2,8 +2,8 @@
 title: ABOUT PARROT
 author: cotes
 date: 2022-11-01 11:33:00 +0800
-categories: [Blogging]
-tags: [typography]
+categories: [生活]
+tags: [萌宠]
 math: true
 mermaid: true
 ---
@@ -21,15 +21,15 @@ mermaid: true
 
 玄凤鹦鹉 —又名鸡尾鹦鹉，头上有羽冠，长约 7 厘米左右，属于中小型鹦鹉，常见的颜色主要有三类：珍珠灰，原始灰和黄化。综合性格和颜值我认为选黄化会好一些，性格比较温和。成年后的公鹦鹉翅膀内侧斑点会消失，变成无斑点，母鹦鹉翅膀内侧一直有斑点。
 
-![img](../_data/assets/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
+![img](/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
 
 ​                                                                                                                     黄化
 
-![img](../_data/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
+![img](/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
 
 ​                                                                                                                原始灰
 
-![img](../_data/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
+![img](/_data/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
 
 ​                                                                                                             珍珠灰
 
