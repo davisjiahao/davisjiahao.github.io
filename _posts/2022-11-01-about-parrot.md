@@ -21,18 +21,9 @@ mermaid: true
 
 玄凤鹦鹉 —又名鸡尾鹦鹉，头上有羽冠，长约 7 厘米左右，属于中小型鹦鹉，常见的颜色主要有三类：珍珠灰，原始灰和黄化。综合性格和颜值我认为选黄化会好一些，性格比较温和。成年后的公鹦鹉翅膀内侧斑点会消失，变成无斑点，母鹦鹉翅膀内侧一直有斑点。
 
-![img](/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
-
-​                                                                                                                     黄化
-
-![img](/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
-
-​                                                                                                                原始灰
-
-![img](/_data/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
-
-​                                                                                                             珍珠灰
-
+![黄化](/_data/assets/img/v2-f9e37a8e77330194b7f652fe7eb0e8ee_1440w.png)
+![原始灰](/_data/assets/img/v2-8ef093362f1510824c17eee163fd2008_1440w.png)
+![珍珠灰](/_data/assets/img/v2-e5c6db23490b9c376e0dc89593e1843b_1440w.png)
 ### 小视频
 
 ​       [玄凤鹦鹉破壳](https://www.bilibili.com/video/BV1fU4y1t7C5/?spm_id_from=autoNext)
@@ -77,17 +68,9 @@ mermaid: true
 
 常见的头类有费氏牡丹鹦鹉，常见的面类是黄桃和绿桃，费氏牡丹鹦鹉的特征是眼睛有白圈，嘴巴为红色。面类的特征是眼睛没有白圈，嘴巴一般为黄色。两者杂交则是骡子，骡子嘴巴带红色，一般情况下不能繁育，面类的经过人工繁育，性格较为温和。
 
-![img](../_data/assets/img/v2-961f3afa7143113ae8a52da734bdcbc0_1440w.png)
-
-​																												黄桃
-
-![img](../_data/assets/img/v2-27d48567406840964c7a25b0da45ca8b_1440w.png)
-
-​																												绿桃
-
-![img](../_data/assets/img/v2-37ab7dd6d4ba86d3eaf71929112496f5_1440w.png)
-
-​																												费氏牡丹
+![黄桃](/_data/assets/img/v2-961f3afa7143113ae8a52da734bdcbc0_1440w.png)
+![绿桃](/_data/assets/img/v2-27d48567406840964c7a25b0da45ca8b_1440w.png)
+![费氏牡丹](/_data/assets/img/v2-37ab7dd6d4ba86d3eaf71929112496f5_1440w.png)
 
 ### 小视频
 
@@ -126,14 +109,8 @@ mermaid: true
 
 虎皮鹦鹉 —— 又名娇凤或者鹦哥 ，属于小型鹦鹉，性情活泼胆大且易于饲养，在中国是大众最喜欢最常见的宠物鸟之一。公鸟成年后鼻膜为蓝色，母鸟为棕色。成年以后头上的虎斑褪去，我们可以从日常观察中能发现公鸟好动一些，更喜欢在房间里到处走，比母鸟更容易亲人，咬人力度更轻。母鸟领地意识更强。
 
-![img](../_data/assets/img/v2-938f2b23edd61d2f06f0340708901b51_1440w.png)
-
-​                																				绿色为最常见的原始种
-
-![img](../_data/assets/img/v2-d64d6fbb37290f3276d0d3ac509bda4d_1440w.png)
-
-​																						         左边为人工培养种
-
+![绿色为最常见的原始种](/_data/assets/img/v2-938f2b23edd61d2f06f0340708901b51_1440w.png)
+![左边为人工培养种](/_data/assets/img/v2-d64d6fbb37290f3276d0d3ac509bda4d_1440w.png)
 ### 小视频
 
 ​       [【虎皮鹦鹉说话】学渣背诗](https://www.bilibili.com/video/BV1nK4y187An/?spm_id_from=333.337.search-card.all.click)
