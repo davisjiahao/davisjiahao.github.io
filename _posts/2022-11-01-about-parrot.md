@@ -1,6 +1,6 @@
 ---
-title: ABOUT PARROT
-author: cotes
+title: 家养鹦鹉饲养入门
+author: daviswujiahao
 date: 2022-11-01 11:33:00 +0800
 categories: [生活]
 tags: [萌宠]

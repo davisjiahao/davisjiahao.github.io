@@ -1,3 +1,13 @@
+---
+title: 家养鹦鹉饲养入门
+author: daviswujiahao
+date: 2022-11-08 11:33:00 +0800
+categories: [技术]
+tags: [对账,系统设计]
+math: true
+mermaid: true
+---
+
 [TOC]
 
 # 背景简介
