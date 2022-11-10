@@ -220,7 +220,7 @@ from
 
 ## 功能模块图
 
-## ![未命名绘图.drawio](/Users/didi/Downloads/未命名绘图.drawio.png)  
+![未命名绘图.drawio](../_data/assets/img/功能模块图.png)  
 
 ### 任务管理
 
@@ -251,7 +251,7 @@ from
 
 ## 现有系统架构图
 
-![未命名绘图-第 2 页.drawio](/Users/didi/Downloads/未命名绘图-第 2 页.drawio.png)
+![架构图](../_data/assets/img/架构图.png)
 
 ## 现有系统核心逻辑实现
 
@@ -266,7 +266,7 @@ from
 
 将对账流程抽象为【数据准备】【对账处理】【差异处理】【结果处理】4个阶段，每个阶段再细分为多个处理节点，各个处理节点可配置多个处理插件，进行实际的处理流程。
 
-![未命名绘图-第 3 页.drawio](/Users/didi/Downloads/未命名绘图-第 3 页.drawio.png)
+![对账流程](../_data/assets/img/对账流程.png)
 
 # 讨论
 
