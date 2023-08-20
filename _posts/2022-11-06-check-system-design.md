@@ -230,7 +230,7 @@ from
 
 ## 功能模块图
 
-![未命名绘图.drawio](/_data/assets/img/功能模块图.png)  
+![未命名绘图.drawio](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/功能模块图.png?raw=true)  
 
 ### 任务管理
 
@@ -261,7 +261,7 @@ from
 
 ## 现有系统架构图
 
-![架构图](/_data/assets/img/架构图.png)
+![架构图](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/架构图.png?raw=true)
 
 ## 现有系统核心逻辑实现
 
@@ -276,7 +276,7 @@ from
 
 将对账流程抽象为【数据准备】【对账处理】【差异处理】【结果处理】4个阶段，每个阶段再细分为多个处理节点，各个处理节点可配置多个处理插件，进行实际的处理流程。
 
-![对账流程](/_data/assets/img/对账流程.png)
+![对账流程](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/对账流程.png?raw=true)
 
 # 讨论
 
