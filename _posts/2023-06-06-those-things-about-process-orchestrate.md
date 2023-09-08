@@ -15,15 +15,6 @@ mermaid: true
 ## 何为编排
 
 在计算机科学和软件工程中，"编排"是指协调和管理多个独立组件或服务，以实现特定的业务流程或工作流程。它涉及到在一个整体系统中将各个组件或服务按照预定的顺序和方式进行调度、执行和交互。编排通常用于构建分布式系统、集成不同的服务或微服务，并实现复杂的业务逻辑和流程。编排的目标是通过协调和组织各个组件或服务之间的交互，以实现特定的功能和业务需求。
-编排可以涉及以下几个方面：
-
-1. 流程定义：编排定义了业务流程或工作流程的步骤、顺序和条件。它描述了系统中各个组件或服务之间的依赖关系和交互方式。
-2. 调度和协调：编排负责根据流程定义，调度和协调各个组件或服务的执行。它确保在正确的时间和顺序下启动和运行每个组件，以满足整体流程的要求。
-3. 数据传递和转换：编排负责管理数据在各个组件或服务之间的传递和转换。它确保正确的数据被传递给需要的组件，并处理数据格式转换和映射等。
-4. 错误处理和故障恢复：编排需要处理可能发生的错误和故障情况。它可以包括错误处理、重试机制、故障恢复策略等，以确保整个流程的可靠性和稳定性。
-编排可以使用不同的工具和技术来实现，例如工作流引擎、编排引擎、容器编排平台等。这些工具提供了一种便捷的方式来定义、执行和管理复杂的业务流程或工作流程。
-总之，编排是一种在分布式系统或微服务架构中协调和管理多个组件或服务的方式，以实现特定的业务逻辑和流程。它涉及到定义流程、调度执行、数据传递、错误处理等任务，以实现系统的整体功能和要求。
-
 ## 编制(Orchestration)VS编排(Choreography)
 
 对于编排的概念定义，业界其实有过激烈的讨论，其中讨论得一个很有意思的点是编制(Orchestration)和编排(Choreography)的区别，本文汇总了一些关于这方面的讨论和大家进行分享，感兴趣的可以参考 [编配和编排的定义之争](https://www.infoq.cn/news/2008/09/Orchestration/)。
@@ -96,6 +87,110 @@ mermaid: true
 
 # 流程编排从0到1
 
+了编排的概念之后，如果要实现一个流程编排的最小集，改如何去实现呢？一般来说，比较完善的编排应该由下面几个部分组成：
+
+1. 流程定义：编排定义了业务流程或工作流程的步骤、顺序和条件。它描述了系统中各个组件或服务之间的依赖关系和交互方式。
+2. 调度和协调：编排负责根据流程定义，调度和协调各个组件或服务的执行。它确保在正确的时间和顺序下启动和运行每个组件，以满足整体流程的要求。
+3. 数据传递和转换：编排负责管理数据在各个组件或服务之间的传递和转换。它确保正确的数据被传递给需要的组件，并处理数据格式转换和映射等。
+4. 错误处理和故障恢复：编排需要处理可能发生的错误和故障情况。它可以包括错误处理、重试机制、故障恢复策略等，以确保整个流程的可靠性和稳定性。
+最小集应该是实现其中的1、2、3点。针对第1、2点，流程的定义可以认为是执行链的定义，如果不考虑流程中的并行流程，可以使用责任链模式来进行流程的定义和串联执行；针对第3点则可以定义简易的上下文字段来进行各个执行节点间数据的传输。基于以上前提，我们可以通过如下方式来实现一个简易的流程编排框架。
+
+## 上下文的定义
+
+```Java
+public class Context implements Serializable {
+
+    private final Map<Class<?>,Object> CONTEXT = new ConcurrentHashMap<>();
+
+    public <T> T get(Class<T> clazz) {
+        return (T) CONTEXT.get(clazz);
+    }
+
+    public void put(Object obj) {
+        if(null == obj) {
+            return;
+        }
+        CONTEXT.put(obj.getClass(),obj);
+    }
+}
+```
+
+## 任务节点的定义
+
+```Java
+public interface ActionTask {
+
+    // 判断是否可以执行
+    bool canProcess();
+
+    // 执行业务逻辑
+    void process(Context context);
+
+}
+```
+
+## 责任链节点的定义
+
+```Java
+
+public class FlowNode {
+    // 本节点执行任务
+    private ActionTask task;
+    // 后续节点任务，大于1则并发执行
+    private List<FlowNode> nextNodes = Lists.newArrayList();
+
+    public FlowNode(ActionTask task) {
+        this.task = task;
+    }
+
+    // 责任链执行
+    public void process(Context context) {
+        if (!task.canProcess()) {
+            return;
+        }
+        task.process();
+        for (FlowNode nextNode : nextNodes) {
+            nextNode.process();
+        }
+    }
+
+    public void addNextNodes(FlowNode node) {
+        nextNodes.add(node);
+    }
+}
+```
+
+## 触发流程
+
+```Java
+public static Main {
+
+    public static void main(String[] args) {
+
+        // 1、定义流程节点
+        // 开始节点
+        FlowNode startNode = new FlowNode(new StartTask());
+        // 活动中心节点
+        FlowNode activityNode = new FlowNode(new ActivityTask());
+        // 库存中心节点
+        FlowNode storeNode = new FlowNode(new StoreTask());
+         // 订单中心节点
+        FlowNode orderNode = new FlowNode(new OrderTask());
+
+        // 构造流程
+        startNode.addNextNodes(activityNode);
+        startNode.addNextNodes(storeNode);
+        storeNode.addNextNodes(orderNode);
+
+        // 链式执行流程
+        startNode.process(new Context());
+        
+    }
+}
+```
+
+
+
 # 开源编排框架调研
 
 ## Zeebe
@@ -107,7 +202,6 @@ mermaid: true
 - 可见性 (visibility)：Zeebe 提供能力展示出企业工作流运行状态，包括当前运行中的工作流数量、平均耗时、工作流当前的故障和错误等；
 - 工作流编排 (workflow orchestration)：基于工作流的当前状态，Zeebe 以事件的形式发布指令 (command)，这些指令可以被一个或多个微服务消费，确保工作流任务可以按预先的定义流转；
 - 监控超时 (monitoring for timeouts) 或其他流程错误：同时提供能力配置错误处理方式，比如有状态的重试或者升级给运维团队手动处理，确保工作流总是能按计划完成。
-
 为了应对超大规模，Zeebe 支持：
 
 - 横向扩容 (horizontal scalability)：Zeebe 支持横向扩容并且不依赖外部的数据库，相反的，Zeebe 直接把数据写到所部署节点的文件系统里，然后在集群内分布式的计算处理，实现高吞吐；
@@ -202,24 +296,374 @@ final JobWorker jobWorker = client.newWorker().jobType("payment-service")
 ```
 
 ### 总结
- 
-由上可知，Zeebe 是有中心控制的
+
+由上可知，Zeebe 是有中心控制的编制(Orchestration)模式，进行微服务编排时，各个微服务引入Client包后，由Broker进行统一的协调调度，来完成单个流程实例的执行。其为超大规模分布式微服务而设计，可通过横向扩容来应对高并发场景的挑战；同时基于状态机的方式记录了单个流程实例的执行情况，为流程执行提供了可监控的抓手。但是由于是中心化设计，流程发起方通过向Zeebe发起流程执行的请求，而由Zeebe间接取进行流程图中各个Job的分发和结果的收集聚合，不可避免存在一些性能损耗。
 
 ## Conductor
 
+### 简介
+
+netflix conductor 是基于 JAVA 语言编写的开源流程引擎，用于架构基于微服务的流程。它具备如下特性：
+
+- 允许创建复杂的业务流程，流程中每个独立的任务都是由一个微服务所实现。
+- 基于 JSON DSL 创建工作流，对任务的执行进行编排。
+- 工作流在执行的过程中可见、可追溯。
+- 提供暂停、恢复、重启等多种控制模型。
+- 提供一种简单的方式来最大限度重用微服务。
+- 拥有扩展到百万流程并发运行的服务能力。
+- 通过队列服务实现客户端与服务端的分离。
+- 支持 HTTP 或其他 RPC 协议进行数据传送
+
+### 整体架构
+![Alt text](../_data/assets/img/conductor.webp)
+主要分为几个部分：
+
+- Orchestrator: 负责流程的流转调度工作；
+- Management/Execution Service: 提供流程、任务的管理更新等操作；
+- TaskQueues: 任务队列，Orchestrator 解析出来的待执行 Task 会放到队列中；
+- Worker: 任务执行 worker，从 TaskQueues 中获取任务，通过 Execution Service 更新任务状态与结果数据；
+- Database: 元数据 & 运行时数据库，用于保存运行时的 Workflow、Task 等状态信息，以及流程任务定义的等原信息；
+- Index: 索引数据库，用于存储执行历史；
+
+### 基本概念
+
+#### Task
+
+Task 是最小执行单元，承载了一段执行逻辑，如发送 HTTP 请求等。
+
+- System Task：被 conductor 服务执行，这些任务的执行与引擎在同一个 JVM 中。
+- Worker Task：被 worker 服务执行，执行与引擎隔离开，worker 通过队列获取任务后，执行并更新结果状态到引擎。Worker 的实现是跨语言的，其使用 Http 协议与 Server 通信。
+conductor 提供了若干内置 SystemTask:
+
+   - 功能性 Task：
+   - HTTP：发送 http 请求
+   - JSON_JQ_TRANSFORM：jq 命令执行，一般用户 json 的转换，具体可见 jq 官方文档
+   - KAFKA_PUBLISH: 发布 kafka 消息
+  
+- 流程控制 Task：
+  
+  - SWITCH（原 Decision）：条件判断分支，类似于代码中的 switch case
+  - FORK：启动并行分支，用于调度并行任务
+  - JOIN：汇总并行分支，用于汇总并行任务
+  - DO_WHILE：循环，类似于代码中的 do while
+  - WAIT：一直在运行中，直到外部时间触发更新节点状态，可用于等待外部操作
+  - SUB_WORKFLOW：子流程，执行其他的流程
+  - TERMINATE：结束流程，以指定输出提前结束流程，可以与 SWITCH 节点配合使用，类似代码中的提前return语句
+ - 自定义 Task：
+   - 对于 System Task，Conductor 提供了 WorkflowSystemTask 抽象类，可以自定义扩展实现。
+   - 对于 Worker Task，可以实现 conductor 的 client Worker 接口实现执行逻辑。
+
+#### Workflow
+
+Workflow 由一系列需要执行的 Task 组成，conductor 采用 json 来描述 Task 的流转关系。
+除基本的顺序流程外，借助内置的 SWITCH、FORK、JOIN、DO_WIHLE、TERMINATE 任务，还能实现分支、并行、循环、提前结束等流程控制。
+
+#### Input&Output
+
+Task 的输入是一种映射，其作为工作流实例化的一部分或某些其他 Task 的输出。允许将来自工作流或其他 Task 的输入 / 输出作为随后执行的 Task 的输入。
+Task 有自己的输入和输出，输入输出都是 jsonobject 类型。
+Task 可以引用其他 Task 的输入输出，使用 ${taskxxx.output} 的方式引用。引用语法为 json-path，除最基础的 ${taskxxx.output} 的值解析方式外，还支持其他复杂操作，如过滤等，具体见 json-path 语法。
+启动 Workflow 时可以传入流程的输入数据，Task 可以通过 ${workflow.input} 的方式引用。
+Task 实现原子操作的处理以及流程控制操作，Workflow 定义描述 Task 的流转关系，Task 引用 Workflow 或者其它 Task 的输入输出。通过这些机制，conductor 实现了 JSON DSL 对流程的描述。
+
+
 ## kstry
+### 简介
+
+[kstry](http://kstry.cn/doc)是流程编排框架、并发框架、微服务业务整合框架。可以将原本存在于代码中错综复杂的方法调用关系以可视化流程图的形式更直观的展示出来，并提供了将所见的方法节点加以控制的配置手段。框架不能脱离程序执行之外存在，只能在方法与方法的调用中生效和使用，比如某个接口的一次调用。不会像Activiti、Camunda等任务流框架一样，脱离程序执行之外将任务实例存储和管理。不同使用场景中，因其发挥作用的不同，可以理解成不同的框架，Kstry 是：
+- 【流程编排框架】提供所见（ 流程图示 ）即所得（ 代码执行 ）的可视化能力，可自定义流程协议，支持流程配置的热部署
+- 【并发框架】可通过极简操作将流程从串行升级到并行，支持任务拆分、任务重试、任务降级、子任务遍历、指定流程或任务的超时时间
+- 【微服务业务整合框架】支持自定义指令和任务脚本，可负责各种基础能力组件的拼装
+- 【轻量的 TMF2.0 (opens new window)框架】可以通过以下三个步骤来满足同一接口下各类业务对实现功能的不同诉求：抽象能力资源、定义并将抽象出的能力资源授权给业务角色、同一流程的不同场景可分别匹配不同角色再将其下的能力资源任务加以执行
+kstry的核心逻辑
+![kstry](../_data/assets/img/kstry.png)
+
+### 使用示例
+
+- 编写组件代码
+  
+``` Java
+@TaskComponent(name = "goods")
+public class GoodsService {
+    
+	@NoticeResult
+    @TaskService(name = "init-base-info")
+    public GoodsDetail initBaseInfo(@ReqTaskParam(reqSelf = true) GoodsDetailRequest request) {
+        return GoodsDetail.builder().id(request.getId()).name("商品").build();
+    }
+}
+
+```
+
+- 定义流程图
+![Alt text](../_data/assets/img/image-20211211151733111.png)
+
+
+- 执行流程
+
+```Java
+
+StoryRequest<GoodsDetail> req = ReqBuilder.returnType(GoodsDetail.class).startId("kstry-demo-goods-show").request(request).build();
+TaskResponse<GoodsDetail> fire = storyEngine.fire(req);
+if (fire.isSuccess()) {
+    return fire.getResult();
+}
+```
+
+
 
 ## LiteFlow
 
-## turbo
+### 简介
+
+[LiteFlow](https://liteflow.cc/pages/5816c5/)是一个非常强大的现代化的规则引擎框架，融合了编排特性和规则引擎的所有特性。可用于复杂的组件化业务的编排领域，独有的 DSL 规则驱动整个复杂业务，并可实现平滑刷新热部署，支持多种脚本语言规则的嵌入。帮助系统变得更加丝滑且灵活。
+
+LiteFlow 适用于拥有复杂逻辑的业务，比如说价格引擎，下单流程等，这些业务往往都拥有很多步骤，这些步骤完全可以按照业务粒度拆分成一个个独立的组件，进行装配复用变更。使用 LiteFlow，你会得到一个灵活度高，扩展性很强的系统。因为组件之间相互独立，也可以避免改一处而动全身的这样的风险。
+
+### 使用示例
+- 定义组件
+  
+```Java
+@LiteflowComponent("b")
+public class Bnode extends NodeComponent {
+
+    @Override
+    public void process() throws Exception {
+        Book contextBean = this.getContextBean(Book.class);
+        contextBean.setName("my");
+        System.out.println(">>>>>>>Bnode 被调用了。。。。。"+ this.getRequestData()  +"oooooooooooooooooooooooo" + contextBean);
+    }
+}
+
+@LiteflowComponent("c")
+public class Cnode extends NodeComponent {
+
+    @Override
+    public void process() throws Exception {
+        System.out.println(">>>>>>>Cnode 被调用了。。。。。"+ this.getRequestData()  +">>>>" +this.getContextBean(Book.class));
+    }
+}
+
+```
+
+- 编写规则文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE flow PUBLIC  "liteflow" "liteflow.dtd">
+<flow>
+    <chain name="chain1">
+        THEN(a, b, c);
+    </chain>
+</flow>
+```
+
+- 执行流程
+```Java
+@SpringBootTest
+class SimonkingLiteflowApplicationTests {
+
+    @Resource
+    private FlowExecutor flowExecutor;
+
+    @Test
+    void contextLoads() {
+        Book book = new Book();
+        book.setName("wsss:" + Thread.currentThread().getName());
+        LiteflowResponse response = flowExecutor.execute2Resp("chain1", "arg****************", book);
+        System.out.println("response:" + JSON.toJSONString(response));
+    }
+}
+```
+
 
 ## Compileflow
+[compileflow](https://github.com/alibaba/compileflow/blob/master/README_CN.md) 是一个非常轻量、高性能、可集成、可扩展的流程引擎。
+compileflow Process 引擎是淘宝工作流 TBBPM 引擎之一，是专注于纯内存执行，无状态的流程引擎，通过将流程文件转换生成 java 代码编译执行，简洁高效。当前是阿里业务中台交易等多个核心系统的流程引擎。
+compileflow 能让开发人员通过流程编辑器设计自己的业务流程，将复杂的业务逻辑可视化，为业务设计人员与开发工程师架起了一座桥梁。
+功能列表:
 
-### 开源对比
+- 高性能：通过将流程文件转换生成 java 代码编译执行，简洁高效。
+- 丰富的应用场景：在阿里巴巴中台解决方案中广泛使用，支撑了导购、交易、履约、资金等多个业务场景。
+- 可集成：轻量、简洁的设计使得可以极其方便地集成到各个解决方案和业务场景中。
+- 完善的插件支持：流程设计目前有 IntelliJ IDEA、Eclipse 插件支持，可以在流程设计中实时动态生成 java 代码并预览，所见即所得。
+- 支持流程设计图导出 svg 文件和单元测试代码。
+- 支持基于 Java 反射和 Spring 容器的代码触发
 
 
 # 流程编排在保险业务的应用
 ![流程编排在页面配置中的应用](../_data/assets/img/流程编排在页面配置中的应用.png)
+基于LiteFlow二次开发的全声明式组件编排的实现
+
+## 声明式组件定义
+
+```Java
+// 声明式组件父类
+public abstract class BaseFlowNodeToContext extends NodeComponent {
+
+    @Override
+    public void process() throws Exception {
+        PageContextH5 context = this.getContextBean(PageContextH5.class);
+        context.getContext().put(getNodeId(), JSON.toJSON(handle(context)));
+    }
+
+    /**
+     * 节点处理
+     * @param contextH5
+     * @return
+     */
+    protected abstract Object handle(PageContextH5 contextH5);
+}
+
+// 方法注解，标识为声明式组件
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+public @interface ParamLiteFlowComponent {
+    String name() default "";
+}
+
+// class注解，标识为包含声明式组件的bean
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Component
+public @interface ParamLiteFlowComponents {
+
+    String prefix() default "";
+
+    @AliasFor(annotation = Component.class, attribute = "value")
+    String value() default "";
+
+    @AliasFor(annotation = Component.class, attribute = "value")
+    String id() default "";
+}
+
+
+// 为业务处理函数添加声明式组件注解
+@ParamLiteFlowComponents
+@HttpApiClient(name = "service-config", interceptor = CommonHttpApiInterceptor.INTERCEPTOR_NAME)
+public interface ServiceConfigApiService {
+    /**
+     * 获取服务配置详情
+     * @param serviceId
+     * @return
+     */
+    @ParamLiteFlowComponent(name = "getServiceConfig")
+    @GetMapping("/v1/service/detailByServiceId")
+    ServiceConfigDetailDTO detailByServiceId(@RequestParam("serviceId") Long serviceId);
+
+    /**
+     *
+     * @param serviceId
+     * @return
+     */
+    @ParamLiteFlowComponent(name = "getProductListByServiceId")
+    @GetMapping("/v1/service/getProductListByServiceId")
+    List<ProductBaseInfo> getProductListByServiceId(@RequestParam("serviceId") Long serviceId);
+}
+```
+
+## 声明式组件自注册
+
+使用反射获取spring容器中被ParamLiteFlowComponents 注解标识的bean，并获取被ParamLiteFlowComponent注解标识的函数，注册为声明式组件
+
+``` Java
+@Configuration
+public class ParamNodeBeanFactory {
+    @PostConstruct
+    public void registerComponent() {
+        Map<String, Object> beansWithAnnotation = BeanUtil.getBeanFactory().getBeansWithAnnotation(ParamLiteFlowComponents.class);
+        for (Map.Entry<String, Object> entry : beansWithAnnotation.entrySet()) {
+            List<Method> methods = Arrays.stream(entry.getValue().getClass().getDeclaredMethods()).
+                    filter(e -> Modifier.isPublic(e.getModifiers())).
+                    collect(Collectors.toList());
+            ParamLiteFlowComponents annotation = AnnotationUtils.findAnnotation(entry.getValue().getClass(), ParamLiteFlowComponents.class);
+            for (Method method : methods) {
+                ParamLiteFlowComponent flowComponent = AnnotationUtils.findAnnotation(method, ParamLiteFlowComponent.class);
+                if (flowComponent == null) {
+                    continue;
+                }
+                String nodeId = annotation.prefix() + (StringUtils.isEmpty(flowComponent.name()) ? method.getName() : flowComponent.name());
+                FlowBus.addSpringScanNode(nodeId, new BaseFlowNodeToContext() {
+                    @SneakyThrows
+                    @Override
+                    protected Object handle(PageContextH5 contextH5) {
+                        List<Object> jsonArray = contextH5.getFlowParas().get(getNodeId());
+                        if (jsonArray == null || jsonArray.size() == 0) {
+                            return method.invoke(entry.getValue());
+                        }
+                        return method.invoke(entry.getValue(), jsonArray.toArray());
+                    }
+                });
+            }
+        }
+    }
+
+}
+
+```
+
+## 流程配置文件
+
+``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow>
+    <nodes>
+        <node id="parseGetServiceConfigParam" name="解析getServiceConfig的入参" type="script" language="groovy">
+            <![CDATA[
+                def serviceId = Long.valueOf(pageContextH5.requestPageDetail.productId);
+                pageContextH5.flowParas.put("getServiceConfig", [serviceId]);
+            ]]>
+        </node>
+        <node id="parseShowInvalidTimeParam" name="解析showInvalidTime的入参" type="script" language="groovy">
+            <![CDATA[
+                def useValidPeriodUnit = pageContextH5.context.getServiceConfig.serviceInfo.useValidPeriodUnit;
+                def useValidPeriod = pageContextH5.context.getServiceConfig.serviceInfo.useValidPeriod;
+                pageContextH5.flowParas.put("showInvalidTime", [useValidPeriodUnit, useValidPeriod]);
+            ]]>
+        </node>
+        <node id="parseQuerySubOrderParam" name="解析querySubOrder的入参" type="script" language="groovy">
+            <![CDATA[
+                def subOrderId = pageContextH5.requestPageDetail.subOrderId;
+                def user = pageContextH5.userInfo;
+                def querySubOrderDTO = new com.xiaoju.manhattan.neptune.domain.dto.QuerySubOrderDTO(subOrderId:subOrderId, user:user);
+                pageContextH5.flowParas.put("querySubOrder", [querySubOrderDTO]);
+            ]]>
+        </node>
+        <node id="parseGetServiceUseRecordParam" name="解析getServiceUseRecord的入参" type="script" language="groovy">
+            <![CDATA[
+                def subOrderId = pageContextH5.requestPageDetail.subOrderId;
+                def user = pageContextH5.userInfo;
+                def queryServiceUseRecordDTO = new com.xiaoju.manhattan.neptune.domain.dto.QueryServiceUseRecordDTO(subOrderId:subOrderId, user:user);
+                pageContextH5.flowParas.put("queryUseRecordList", [queryServiceUseRecordDTO]);
+            ]]>
+        </node>
+    </nodes>
+
+    <!-- 服务兑换结果页 -->
+    <chain name="showServiceResultFlow">
+        THEN(
+        THEN(parseGetServiceConfigParam, getServiceConfig),
+        WHEN(
+            THEN(parseShowInvalidTimeParam, showInvalidTime),
+            THEN(parseQuerySubOrderParam, querySubOrder),
+            THEN(parseGetServiceUseRecordParam, queryUseRecordList)
+             ),
+        generateRequestId
+        );
+    </chain>
+</flow>
+```
+
+### 执行流程
+
+```Java
+Map<String, OBject> context = Map.newHashMap();
+LiteflowResponse liteflowResponse = flowExecutor.execute2Resp("flowName.xml", null, context);
+```
 
 
 # 参考文献
@@ -229,3 +673,5 @@ final JobWorker jobWorker = client.newWorker().jobType("payment-service")
 - [Orchestration vs Choreography](https://camunda.com/blog/2023/02/orchestration-vs-choreography/)
 - [编制与协同设计](https://gudaoxuri.gitbook.io/microservices-architecture/wei-fu-wu-hua-zhi-ji-shu-jia-gou/services-invoke)
 - [编排的概念以及应用编排，服务编排和容器编排的区别](https://developer.aliyun.com/article/1270564)
+- [工作流可以赋能的几个技术方向](https://zhuanlan.zhihu.com/p/445880346)
+- [流程编排引擎技术方向](https://juejin.cn/s/%E6%B5%81%E7%A8%8B%E7%BC%96%E6%8E%92%E5%BC%95%E6%93%8E%E6%8A%80%E6%9C%AF%E6%96%B9%E5%90%91)
