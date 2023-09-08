@@ -100,6 +100,111 @@ mermaid: true
 
 ## Zeebe
 
+### 基本介绍
+
+[Zeebe](https://docs.camunda.io/docs/0.26/components/zeebe/deployment-guide/getting-started/)是一个用于微服务编排的开源工作流引擎。在Camunda基于BPMN2.0工作流基础上衍生出来的，设计很灵活，不需要依赖后端的存储，支持复制、分片（借鉴了kafka），支持同步和异步发起流程，它提供了：
+
+- 可见性 (visibility)：Zeebe 提供能力展示出企业工作流运行状态，包括当前运行中的工作流数量、平均耗时、工作流当前的故障和错误等；
+- 工作流编排 (workflow orchestration)：基于工作流的当前状态，Zeebe 以事件的形式发布指令 (command)，这些指令可以被一个或多个微服务消费，确保工作流任务可以按预先的定义流转；
+- 监控超时 (monitoring for timeouts) 或其他流程错误：同时提供能力配置错误处理方式，比如有状态的重试或者升级给运维团队手动处理，确保工作流总是能按计划完成。
+
+为了应对超大规模，Zeebe 支持：
+
+- 横向扩容 (horizontal scalability)：Zeebe 支持横向扩容并且不依赖外部的数据库，相反的，Zeebe 直接把数据写到所部署节点的文件系统里，然后在集群内分布式的计算处理，实现高吞吐；
+- 容错 (fault tolerance)：通过简单配置化的副本机制，确保 Zeebe 能从软硬件故障中快速恢复，并且不会有数据丢失；
+- 消息驱动架构 (message-driven architecture)：所有工作流相关事件被写到只追加写的日志 (append-only log) 里；
+- 发布 - 订阅交互模式 (publish-subscribe interaction model)：可以保证连接到 Zeebe 的微服务根据实际的处理能力，自主的消费事件执行任务，同时提供平滑流量和背压的机制；
+- BPMN2.0 标准 (Visual workflows modeled in ISO-standard BPMN 2.0)：保证开发和业务能够使用相同的语言协作设计工作流；
+- 语言无关的客户端模型 (language-agnostic client model)：可以使用任何编程语言构建 Zeebe 客户端。
+
+Zeebe架构主要包含 4 大组件：client, gateway, brokers 以及 exporters:
+![Zeebe架构图](../_data/assets/img/zeebe-architecture.png)
+
+- Client
+嵌入到应用程序 (执行业务逻辑的微服务) 的库,可以完全独立于 Zeebe 扩缩容，用于跟 Zeebe 集群连接通信。客户端通过基于 HTTP/2 协议的 gRPC 与 Zeebe gateway 连接, 可用于：
+  - 部署流程
+  - 处理业务逻辑
+  - 可以集成到各种语言项目中进行使用
+  Client 中，执行单独任务的单元叫 JobWorker。
+JobWorker定期请求某种类型的工作（即轮询）。此间隔和请求的作业数量可在 Zeebe 客户端中配置。如果请求类型的一项或多项作业可用，则 Zeebe会将激活的作业流式传输给工作人员。接收到作业后，JobWorker执行它们，并根据作业是否可以成功完成，为每个作业发回完成或失败命令。
+许多JobWorker可以请求相同的工作类型，以扩大加工规模。在这种情况下，Zeebe 确保每个作业仅发送给其中一个JobWorker。此类作业被视为已激活，直到作业完成、失败或作业激活超时。
+![JobWorker](../_data/assets/img/zeebe-job-workers-graphic.png)
+
+- Gateway：
+  - zeebe集群的统一入口点，将请求转发给代理
+  - 网关是无状态的，可以根据需要添加网关，以实现负载平衡和高可用性
+- Broker：
+Broker 是分布式的流程引擎，维护运行中流程实例的状态。Brokers 可以分区以实现横向扩容、副本以实现容错。通常情况下，Zeebe 集群都不止一个节点。broker 不包含任何业务逻辑，它只负责：
+  - 处理客户端发送的指令
+  - 存储和管理运行中流程实例的状态
+  - 分配任务给 job workers
+Brokes 形成一个对等网络 (peer-to-peer)，这样集群不会有单点故障。集群中所有节点都承担相同的职责，所以一个节点不可用后，节点的任务会被透明的重新分配到网络中其他节点。
+
+- Exporter: 提供 Zeebe 内状态变化的事件流。这些事件流数据有很多潜在用处，包括但不限于：
+  - 监控当前流程的执行状态
+  - 分析历史工作流数据，用于审计、商业使用
+  - Zeebe异常追踪
+
+- 额外的扩展组件：
+  - Modeler：一个创建和编辑BPMN可视化工具。可以远程运行、部署BPMN文件
+  - Operate：一个监控Zeebe流程执行的可视化工具
+  - Tasklist：是一个在Zeebe中处理用户任务的工具。您可以过滤、声明和完成用户任务。
+
+### 代码示例
+
+```Java
+
+// 1、创建和gateway交互的client
+final String gatewayAddress = System.getenv("ZEEBE_ADDRESS");
+final ZeebeClient client =
+            ZeebeClient.newClientBuilder()
+                .gatewayAddress(gatewayAddress)
+                .build();
+
+// 2、使用client部署工作流程
+final DeploymentEvent deployment = client.newDeployCommand()
+            .addResourceFromClasspath("order-process.bpmn")
+            .send()
+            .join();    
+
+// 3、创建工作流实例
+final Map<String, Object> data = new HashMap<>();
+        data.put("orderId", 31243);
+        data.put("orderItems", Arrays.asList(435, 182, 376));
+final WorkflowInstanceEvent wfInstance = client.newCreateInstanceCommand()
+    .bpmnProcessId("order-process")
+    .latestVersion()
+    .variables(data) // data 为流程实例上下文参数
+    .send()
+    .join();
+
+// 4、创建JobWorker接收类型为“payment-service”的执行任务
+// “payment-service” 为“order-proces”流程中的任务节点
+final JobWorker jobWorker = client.newWorker().jobType("payment-service")
+    .handler((jobClient, job) ->
+    {
+        final Map<String, Object> variables = job.getVariablesAsMap();
+
+        System.out.println("Process order: " + variables.get("orderId"));
+        double price = 46.50;
+        System.out.println("Collect money: $" + price);
+
+        final Map<String, Object> result = new HashMap<>();
+        result.put("totalPrice", price);
+
+        jobClient.newCompleteCommand(job.getKey())
+            .variables(result)
+            .send()
+            .join();
+    })
+    .fetchVariables("orderId")
+    .open();
+```
+
+### 总结
+ 
+由上可知，Zeebe 是有中心控制的
+
 ## Conductor
 
 ## kstry
@@ -109,6 +214,9 @@ mermaid: true
 ## turbo
 
 ## Compileflow
+
+### 开源对比
+
 
 # 流程编排在保险业务的应用
 ![流程编排在页面配置中的应用](../_data/assets/img/流程编排在页面配置中的应用.png)
