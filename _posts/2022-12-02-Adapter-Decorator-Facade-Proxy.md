@@ -33,10 +33,10 @@ mermaid: true
 不管采用何种方式，其基本的实现思想都是：对现有接口的实现类进行扩展，使其实现客户期望的目标接口。
 
 类适配器通过继承现有接口类并实现目标接口，这样的话会使得现有接口类完全对适配器暴露，使得适配器具有现有接口类的全部功能，破坏了封装性。此外从逻辑上来说，这也是不符合常理的，适配器要做的是扩展现有接口类的功能而不是替代，类适配器只有在特定条件下会被使用。
-![Alt text](../_data/assets/img/adapter-class-uml.webp)
+![Alt text](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/adapter-class-uml.webp?raw=true)
 
 对象适配器持有现有接口类一个实例，并扩展其功能，实现目标接口。这是推荐的方式，优先采用组合而不是继承，会使得代码更利于维护。此外，这也是非常符合常理的 ——“给我一根线，让我来给他加长到 5m，我并不需要知道这跟线是什么组成的，因为我的工作就是让线加长到 5m”—— 我们扩展了相应功能而并不关心其具体实现。
-![Alt text](../_data/assets/img/adapter-object-uml.webp)
+![Alt text](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/adapter-object-uml.webp?raw=true)
 
 
 Target：客户期望获得的功能接口 (220V 电压供电)。
@@ -183,7 +183,7 @@ public class Test {
 
 ### 类图介绍
 
-![Alt text](../_data/assets/img/Wrapper.webp)
+![Alt text](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/Wrapper.webp?raw=true)
 
 在装饰器模式中的角色有：
 
@@ -378,7 +378,7 @@ public class Facade {
 
 ### 类图介绍
 
-![Alt text](../_data/assets/img/proxy.png)
+![Alt text](https://github.com/davisjiahao/davisjiahao.github.io/blob/main/_data/assets/img/proxy.png?raw=true)
 
 Subject: 定义 RealSubject 对外的接口，且这些接口必须被 Proxy 实现，这样外部调用 proxy 的接口最终都被转化为对 realsubject 的调用。
 RealSubject: 真正的目标对象。
